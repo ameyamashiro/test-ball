@@ -1,7 +1,346 @@
+var stage;
+var canvas;
+var context;
+
+var target;
+var tgtClicked = false;
+
+var targets;
+var movables;
+var mvIndex   = 0; // movables がクリックされているオブジェクトのindexが格納
+var mvClicked = false;
+
+var ina;
+
+$(function() {	
+	canvas = document.getElementById("canvas");
+	context = canvas.getContext("2d");
+	stage = new createjs.Stage(canvas);
+
+	//stage.x = -100;
+	
+	stage.scaleY = 1.0;
+	stage.scaleX = 1.0;
+
+	createjs.Ticker.addListener(window);
+	createjs.Ticker.useRAF = true;
+
+	// 選択反転の動作の停止
+	canvas.onmousedown = function(e) {
+		e.preventDefault();
+		return false;
+	}
+
+	targets  = new createjs.Container();
+	movables = new createjs.Container();
+	stage.addChild(targets);
+	stage.addChild(movables);
+
+	// test balls
+	var blueC   = new Effects("BlurredCircle", 1024 * 0.2, 300, 80, "#00f");
+	var greenC  = new Effects("BlurredCircle", 1024 * 0.5, 300, 80, "#a0a");
+	var redC    = new Effects("BlurredCircle", 1024 * 0.8, 300, 80, "#40c");
+	stage.addChild(blueC);
+	stage.addChild(greenC);
+	stage.addChild(redC);
+	
+	// test tween
+	createjs.Tween.get(blueC, {loop: true})
+		.to({y: 30}, 1000, createjs.Ease.circleInOut)
+		.to({y: 40}, 500, createjs.Ease.linear)
+		.to({y: 30}, 1000, createjs.Ease.circleInOut)
+		.to({y: 0}, 1000, createjs.Ease.circleOut)
+		.to({y: -30}, 1000, createjs.Ease.circleInOut)
+		.to({y: -40}, 500, createjs.Ease.linear)
+		.to({y: -30}, 1000, createjs.Ease.circleInOut)
+		.to({y: 0}, 1000, createjs.Ease.circleOut);
+
+	createjs.Tween.get(greenC, {loop: true})
+		.wait(500)
+		.to({y: 30}, 1000, createjs.Ease.circleInOut)
+		.to({y: 40}, 500, createjs.Ease.linear)
+		.to({y: 30}, 1000, createjs.Ease.circleInOut)
+		.to({y: 0}, 1000, createjs.Ease.circleOut)
+		.to({y: -30}, 1000, createjs.Ease.circleInOut)
+		.to({y: -40}, 500, createjs.Ease.linear)
+		.to({y: -30}, 1000, createjs.Ease.circleInOut)
+		.to({y: 0}, 1000, createjs.Ease.circleOut);
+	
+	createjs.Tween.get(redC, {loop: true})
+		.wait(200)
+		.to({y: 30}, 1000, createjs.Ease.circleInOut)
+		.to({y: 40}, 500, createjs.Ease.linear)
+		.to({y: 30}, 1000, createjs.Ease.circleInOut)
+		.to({y: 0}, 1000, createjs.Ease.circleOut)
+		.to({y: -30}, 1000, createjs.Ease.circleInOut)
+		.to({y: -40}, 500, createjs.Ease.linear)
+		.to({y: -30}, 1000, createjs.Ease.circleInOut)
+		.to({y: 0}, 1000, createjs.Ease.circleOut);
+
+	targets.addChild(blueC);
+	targets.addChild(greenC);
+	targets.addChild(redC);
+
+	ina    = new ina_createjs(stage);
+	var circle = ina.povCircleB(0, 0, 60, 10, "#fff");
+	circle.x = 1024 * 0.3;
+	circle.y = 100;
+	movables.addChild(circle);
+	/*
+	var circle2 = ina.povCircleB(0, 0, 60, 10, "#f00");
+	circle2.x = 1024 * 0.7;
+	circle2.y = 100;
+	movables.addChild(circle2);
+	*/
+	
+	//target.x = 100;
+	//target.y = 100;
+
+//	createjs.Tween.get(circle, {loop: true})
+//		.to({x: 1024}, 5000, createjs.Ease.linear);
+
+
+/*
+	target = new createjs.Container();
+
+	var circle = new Effects("BlurredCircle", 0, 0, 50, "#f00");
+	target.addChild(circle);
+
+	stage.addChild(target);
+
+	target.x = 100;
+	target.y = 100;
+
+	createjs.Tween.get(circle, {loop: true})
+		.to({x: 2}, 10, createjs.Ease.linear)
+		.to({y: 3}, 10, createjs.Ease.linear)
+		.to({x: -1}, 10, createjs.Ease.linear);
+
+*/
+
+
+
+	// イベント類
+	stage.addEventListener("stagemousedown", onMouseDown);
+	stage.addEventListener("stagemouseup", onMouseUp);
+	stage.addEventListener("stagemousemove", onMouseMove);
+});
+
+function onMouseDown(event)
+{
+	var childNum = movables.getNumChildren();
+	for ( var i = 0; i < childNum; i++ ) {
+		var movable = movables.getChildAt(i);
+		var pt = movable.globalToLocal(stage.mouseX, stage.mouseY);
+		if(movable.hitTest(pt.x, pt.y)) {
+			mvClicked = true;
+			mvIndex = i;
+			console.log(mvIndex);
+			return;
+		}
+	}
+	/*
+	var pt = target.globalToLocal(stage.mouseX, stage.mouseY);
+	if(target.hitTest(pt.x, pt.y)) {
+		tgtClicked = true;
+	}
+	*/
+}
+
+function onMouseMove(event)
+{
+	if(mvClicked) {
+		var movable = movables.getChildAt(mvIndex);
+		movable.x = event.stageX;
+		movable.y = event.stageY;
+	}
+}
+
+function onMouseUp(event)
+{
+	if(mvClicked) {
+		var childNum = targets.getNumChildren();
+		for ( var i = 0; i < childNum; i++ ) {
+			var target = targets.getChildAt(i);
+			
+			var pt = target.globalToLocal(stage.mouseX, stage.mouseY);
+			if ( target.hitTest(pt.x, pt.y) ) {
+				console.log("go to"+i);
+
+				var movable = movables.getChildAt(0); // ------------------------------------------------------
+				//createjs.Tween.get(movable)
+				//	.to({scaleX: 50, scaleY: 50}, 1000, createjs.Ease.linear);
+
+				console.log(stage.mouseX, stage.mouseY);
+				
+				ina.transEffect(stage.mouseX, stage.mouseY, 50, 50, "#fff");
+
+			}
+		}
+		/*
+		var pt = ball.globalToLocal(stage.mouseX, stage.mouseY);
+		if(ball.hitTest(pt.x, pt.y) && mvClicked) {
+			console.log("do blue ball transition");
+			var movable = movables.getChildAt(mvIndex);
+	
+			createjs.Tween.get(movable)
+				.to({scaleX: 50, scaleY: 50}, 1000, createjs.Ease.linear);
+		}
+		*/
+	}
+
+	mvClicked  = false;
+	mvIndex    = false;
+}
+
+function tick(event)
+{
+	stage.update();	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 (function (window) {
+	var STAGE_WIDTH  = 1024;
+	var STAGE_HEIGHT = 500;
 
 	function ina_createjs(stage)
 	{
+		// --- transition effect --- //
+		var transEffect = function(x, y, width, height, color)
+		{
+			var object;
+
+			// createRect(x, y, width, height, color);
+			var curX = 0;
+			var curY = 0;
+
+			var points = new Array();
+
+			var forSafeCnt = 0;
+			
+			// 画面が全て埋まる四角形を作成
+			while(true) {
+				forSafeCnt++;
+				if(forSafeCnt > 10000) break;
+
+				if ( curX < STAGE_WIDTH ) {
+					// 設置座標の格納
+					points.push({x: curX, y: curY});
+					curX += width;
+				} 
+				// x 座標がオーバーしたら下に移動	
+				else if ( (curX > STAGE_WIDTH) && (curY < STAGE_HEIGHT) ) {
+					curX  = 0;
+					curY += height;
+				}
+
+				// x も y も超過してると終了
+				if ( (curX >= STAGE_WIDTH) && (curY >= STAGE_HEIGHT) ) {
+					break;
+				}
+			}
+
+	
+
+			// 計算した座標通りに Tween で飛ばす		
+			object = new createjs.Container();
+			stage.addChild(object);
+			var len = points.length;	
+			var randomNumber = new Array();
+
+			function arrayHaveNumber(array, number)
+			{
+				var flag = false;
+				var len = array.length;
+				for ( var i = 0; i < len; i++ ) {
+					if(array[i] == number) {
+						flag = true;
+					}
+				}
+				return flag;
+			}
+
+			for (var cnt = 0 ; cnt < len; cnt++) {
+
+				var test = 0;
+
+				// 動かすオブジェクトのindex
+				do {
+					var tgtNum = Math.floor(Math.random() * len);
+				
+				} while ( arrayHaveNumber(randomNumber, tgtNum) );
+				randomNumber.push(tgtNum);
+				
+				var point = points[tgtNum];
+
+				var rect = createRect(x, y, width, height, color);
+
+				pt = rect.globalToLocal(point.x, point.y);
+
+				//console.log(pt.x, pt.y);
+				
+				createjs.Tween.get(rect)
+					.wait(cnt * 20)
+					.to({x: pt.x - x, y: pt.y - y}, 100, createjs.Ease.linear);
+
+				object.addChild(rect);
+			}
+			/*
+			for ( var i = 0; i < len; i++ ) {
+				
+				var point = points[i];
+
+				var rect = createRect(x, y, width, height, color);
+
+				pt = rect.globalToLocal(point.x, point.y);
+
+				//console.log(pt.x, pt.y);
+				
+				createjs.Tween.get(rect)
+					.wait(i * 50)
+					.to({x: pt.x - 100, y: pt.y - 100}, 100, createjs.Ease.linear);
+
+				object.addChild(rect);
+				//console.log(point);
+			}
+			*/
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
 		// --- 普通の円 --- //
 		var circle = function(x, y, size, color)
 		{
@@ -107,6 +446,16 @@
 			return circle;
 		}
 
+		// 四角形の作成
+		function createRect(x, y, width, height, color) {
+			var rect = new createjs.Shape();
+			var g = rect.graphics;
+			g.beginFill(color);
+			g.drawRect(x, y, width, height);
+
+			return rect;
+		}
+
 		// ぼかしの適用
 		function blur(object, x, y, radius) 
 		{
@@ -121,213 +470,11 @@
 		return {
 			circle: circle,
 			povCircle: povCircle,
-			povCircleB: povCircleB
+			povCircleB: povCircleB,
+			transEffect: transEffect
 		};
 	} // function ina()
 
 
 	window.ina_createjs = ina_createjs;
 }) (window);
-
-
-
-
-
-
-var stage;
-var canvas;
-var context;
-
-var target;
-var tgtClicked = false;
-
-var targets;
-var movables;
-var mvIndex   = 0; // movables がクリックされているオブジェクトのindexが格納
-var mvClicked = false;
-
-var boll;
-
-
-$(function() {	
-	canvas = document.getElementById("canvas");
-	context = canvas.getContext("2d");
-	stage = new createjs.Stage(canvas);
-
-	//stage.x = -100;
-	
-	stage.scaleY = 1.0;
-	stage.scaleX = 1.0;
-
-	createjs.Ticker.addListener(window);
-	createjs.Ticker.useRAF = true;
-
-	// 選択反転の動作の停止
-	canvas.onmousedown = function(e) {
-		e.preventDefault();
-		return false;
-	}
-
-	targets  = new createjs.Container();
-	movables = new createjs.Container();
-	stage.addChild(targets);
-	stage.addChild(movables);
-
-	// test balls
-	var blueC   = new Effects("BlurredCircle", 1024 * 0.2, 300, 80, "#00f");
-	var greenC  = new Effects("BlurredCircle", 1024 * 0.5, 300, 80, "#a0a");
-	var redC    = new Effects("BlurredCircle", 1024 * 0.8, 300, 80, "#40c");
-	stage.addChild(blueC);
-	stage.addChild(greenC);
-	stage.addChild(redC);
-	
-	// test tween
-	createjs.Tween.get(blueC, {loop: true})
-		.to({y: 30}, 1000, createjs.Ease.circleInOut)
-		.to({y: 40}, 500, createjs.Ease.linear)
-		.to({y: 30}, 1000, createjs.Ease.circleInOut)
-		.to({y: 0}, 1000, createjs.Ease.circleOut)
-		.to({y: -30}, 1000, createjs.Ease.circleInOut)
-		.to({y: -40}, 500, createjs.Ease.linear)
-		.to({y: -30}, 1000, createjs.Ease.circleInOut)
-		.to({y: 0}, 1000, createjs.Ease.circleOut);
-
-	createjs.Tween.get(greenC, {loop: true})
-		.wait(500)
-		.to({y: 30}, 1000, createjs.Ease.circleInOut)
-		.to({y: 40}, 500, createjs.Ease.linear)
-		.to({y: 30}, 1000, createjs.Ease.circleInOut)
-		.to({y: 0}, 1000, createjs.Ease.circleOut)
-		.to({y: -30}, 1000, createjs.Ease.circleInOut)
-		.to({y: -40}, 500, createjs.Ease.linear)
-		.to({y: -30}, 1000, createjs.Ease.circleInOut)
-		.to({y: 0}, 1000, createjs.Ease.circleOut);
-	
-	createjs.Tween.get(redC, {loop: true})
-		.wait(200)
-		.to({y: 30}, 1000, createjs.Ease.circleInOut)
-		.to({y: 40}, 500, createjs.Ease.linear)
-		.to({y: 30}, 1000, createjs.Ease.circleInOut)
-		.to({y: 0}, 1000, createjs.Ease.circleOut)
-		.to({y: -30}, 1000, createjs.Ease.circleInOut)
-		.to({y: -40}, 500, createjs.Ease.linear)
-		.to({y: -30}, 1000, createjs.Ease.circleInOut)
-		.to({y: 0}, 1000, createjs.Ease.circleOut);
-
-	targets.addChild(blueC);
-	targets.addChild(greenC);
-	targets.addChild(redC);
-
-	var ina    = new ina_createjs(stage);
-	var circle = ina.povCircleB(0, 0, 60, 10, "#fff");
-	circle.x = 1024 * 0.3;
-	circle.y = 100;
-	movables.addChild(circle);
-	/*
-	var circle2 = ina.povCircleB(0, 0, 60, 10, "#f00");
-	circle2.x = 1024 * 0.7;
-	circle2.y = 100;
-	movables.addChild(circle2);
-	*/
-	
-	//target.x = 100;
-	//target.y = 100;
-
-//	createjs.Tween.get(circle, {loop: true})
-//		.to({x: 1024}, 5000, createjs.Ease.linear);
-
-
-/*
-	target = new createjs.Container();
-
-	var circle = new Effects("BlurredCircle", 0, 0, 50, "#f00");
-	target.addChild(circle);
-
-	stage.addChild(target);
-
-	target.x = 100;
-	target.y = 100;
-
-	createjs.Tween.get(circle, {loop: true})
-		.to({x: 2}, 10, createjs.Ease.linear)
-		.to({y: 3}, 10, createjs.Ease.linear)
-		.to({x: -1}, 10, createjs.Ease.linear);
-
-*/
-
-
-
-	// イベント類
-	stage.addEventListener("stagemousedown", onMouseDown);
-	stage.addEventListener("stagemouseup", onMouseUp);
-	stage.addEventListener("stagemousemove", onMouseMove);
-});
-
-function onMouseDown(event)
-{
-	var childNum = movables.getNumChildren();
-	for ( var i = 0; i < childNum; i++ ) {
-		var movable = movables.getChildAt(i);
-		var pt = movable.globalToLocal(stage.mouseX, stage.mouseY);
-		if(movable.hitTest(pt.x, pt.y)) {
-			mvClicked = true;
-			mvIndex = i;
-			console.log(mvIndex);
-			return;
-		}
-	}
-	/*
-	var pt = target.globalToLocal(stage.mouseX, stage.mouseY);
-	if(target.hitTest(pt.x, pt.y)) {
-		tgtClicked = true;
-	}
-	*/
-}
-
-function onMouseMove(event)
-{
-	if(mvClicked) {
-		var movable = movables.getChildAt(mvIndex);
-		movable.x = event.stageX;
-		movable.y = event.stageY;
-	}
-}
-
-function onMouseUp(event)
-{
-	if(mvClicked) {
-		var childNum = targets.getNumChildren();
-		for ( var i = 0; i < childNum; i++ ) {
-			var target = targets.getChildAt(i);
-			
-			var pt = target.globalToLocal(stage.mouseX, stage.mouseY);
-			if ( target.hitTest(pt.x, pt.y) ) {
-				console.log("go to"+i);
-
-				var movable = movables.getChildAt(0); // ------------------------------------------------------
-				createjs.Tween.get(movable)
-					.to({scaleX: 50, scaleY: 50}, 1000, createjs.Ease.linear);
-			}
-		}
-		/*
-		var pt = ball.globalToLocal(stage.mouseX, stage.mouseY);
-		if(ball.hitTest(pt.x, pt.y) && mvClicked) {
-			console.log("do blue ball transition");
-			var movable = movables.getChildAt(mvIndex);
-	
-			createjs.Tween.get(movable)
-				.to({scaleX: 50, scaleY: 50}, 1000, createjs.Ease.linear);
-		}
-		*/
-	}
-
-	mvClicked  = false;
-	mvIndex    = false;
-}
-
-function tick(event)
-{
-	stage.update();	
-}
-
-
