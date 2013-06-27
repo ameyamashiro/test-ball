@@ -45,28 +45,28 @@ $(function() {
 	bmp3.regX = 230 * 0.50;
 	bmp3.regY = 230 * 0.50;
 
-	bmp.x  = STAGE_WIDTH * 0.2;
-	bmp2.x = STAGE_WIDTH * 0.5;
-	bmp3.x = STAGE_WIDTH * 0.8;
-	bmp.y  = STAGE_HEIGHT * 0.2;
-	bmp2.y = STAGE_HEIGHT * 0.2;
-	bmp3.y = STAGE_HEIGHT * 0.2;
 
-
+/*
 	stage.addChild(bmp);
 	stage.addChild(bmp2);
 	stage.addChild(bmp3);
+*/
 
 	targets  = new createjs.Container();
 	movables = new createjs.Container();
 	stage.addChild(targets);
 	stage.addChild(movables);
 
+	var blueC = bmp;
+	var greenC = bmp2;
+	var redC   = bmp3;
 
 	// test balls
+	/*
 	var blueC   = new Effects("BlurredCircle", 1024 * 0.2, 300, 80, "#00f");
 	var greenC  = new Effects("BlurredCircle", 1024 * 0.5, 300, 80, "#a0a");
 	var redC    = new Effects("BlurredCircle", 1024 * 0.8, 300, 80, "#40c");
+	*/
 	/*
 	stage.addChild(blueC);
 	stage.addChild(greenC);
@@ -76,8 +76,17 @@ $(function() {
 	// test tween
 	createjs.Tween.get(blueC, {loop: true})
 		.to({y: 30}, 1000, createjs.Ease.circleInOut)
-		.to({y: 40}, 500, createjs.Ease.linear)
+		.to({y: 40}, 1000, createjs.Ease.circleInOut)
+		//.to({scaleY: 0.8}, 100, createjs.Ease.linear)
+
+		.to({scaleX: 1.05}, 50, createjs.Ease.linear)
+		.to({scaleY: 0.9}, 100, createjs.Ease.linear)
+		.to({scaleX: 1.0}, 100, createjs.Ease.linear)
+		.to({scaleY: 1.0}, 50, createjs.Ease.linear)
+
 		.to({y: 30}, 1000, createjs.Ease.circleInOut)
+		.to({y: 30}, 1000, createjs.Ease.circleInOut)
+
 		.to({y: 0}, 1000, createjs.Ease.circleOut)
 		.to({y: -30}, 1000, createjs.Ease.circleInOut)
 		.to({y: -40}, 500, createjs.Ease.linear)
@@ -85,7 +94,11 @@ $(function() {
 		.to({y: 0}, 1000, createjs.Ease.circleOut);
 
 	createjs.Tween.get(greenC, {loop: true})
-		.wait(500)
+		.wait(300)
+		.to({scaleX: 1.05}, 50, createjs.Ease.linear)
+		.to({scaleY: 0.9}, 100, createjs.Ease.linear)
+		.to({scaleX: 1.0}, 100, createjs.Ease.linear)
+		.to({scaleY: 1.0}, 50, createjs.Ease.linear)
 		.to({y: 30}, 1000, createjs.Ease.circleInOut)
 		.to({y: 40}, 500, createjs.Ease.linear)
 		.to({y: 30}, 1000, createjs.Ease.circleInOut)
@@ -97,6 +110,7 @@ $(function() {
 	
 	createjs.Tween.get(redC, {loop: true})
 		.wait(200)
+		.to({y: 0}, 1000, createjs.Ease.circleOut)
 		.to({y: 30}, 1000, createjs.Ease.circleInOut)
 		.to({y: 40}, 500, createjs.Ease.linear)
 		.to({y: 30}, 1000, createjs.Ease.circleInOut)
@@ -104,17 +118,50 @@ $(function() {
 		.to({y: -30}, 1000, createjs.Ease.circleInOut)
 		.to({y: -40}, 500, createjs.Ease.linear)
 		.to({y: -30}, 1000, createjs.Ease.circleInOut)
+		.to({scaleX: 1.05}, 50, createjs.Ease.linear)
+		.to({scaleY: 0.9}, 100, createjs.Ease.linear)
+		.to({scaleX: 1.0}, 100, createjs.Ease.linear)
+		.to({scaleY: 1.0}, 50, createjs.Ease.linear)
 		.to({y: 0}, 1000, createjs.Ease.circleOut);
 
-	targets.addChild(blueC);
-	targets.addChild(greenC);
-	targets.addChild(redC);
+	var googleImage = new createjs.Container();
+	var yahooImage  = new createjs.Container();
+	var ryukyuImage = new createjs.Container();
+
+	googleImage.addChild(blueC);
+	yahooImage.addChild(greenC);
+	ryukyuImage.addChild(redC);
+
+	googleImage.x  = STAGE_WIDTH * 0.2;
+	yahooImage.x   = STAGE_WIDTH * 0.5;
+	ryukyuImage.x  = STAGE_WIDTH * 0.8;
+	googleImage.y  = STAGE_HEIGHT * 0.6;
+	yahooImage.y   = STAGE_HEIGHT * 0.6;
+	ryukyuImage.y  = STAGE_HEIGHT * 0.6;
+
+
+	targets.addChild(googleImage);
+	targets.addChild(yahooImage);
+	targets.addChild(ryukyuImage);
 
 	ina    = new ina_createjs(stage);
+/*
 	var circle = ina.povCircleB(0, 0, 60, 10, "#fff");
 	circle.x = 1024 * 0.3;
 	circle.y = 100;
 	movables.addChild(circle);
+	*/
+	var movable = new createjs.Bitmap("./images/movable.PNG");
+	movable.regX = 50;
+	movable.regY = 50;
+	movable.x = 100;
+	movable.y = 100;
+	createjs.Tween.get(movable, {loop: true})
+		.to({scaleX: 1.05}, 50, createjs.Ease.linear)
+		.to({scaleY: 1.05}, 100, createjs.Ease.linear)
+		.to({scaleX: 1.0}, 100, createjs.Ease.linear)
+		.to({scaleY: 1.0}, 50, createjs.Ease.linear)
+	movables.addChild(movable);
 	/*
 	var circle2 = ina.povCircleB(0, 0, 60, 10, "#f00");
 	circle2.x = 1024 * 0.7;
@@ -164,7 +211,6 @@ function onMouseDown(event)
 		if(movable.hitTest(pt.x, pt.y)) {
 			mvClicked = true;
 			mvIndex = i;
-			console.log(mvIndex);
 			return;
 		}
 	}
@@ -210,11 +256,24 @@ function onMouseUp(event)
 
 			var pt = target.globalToLocal(stage.mouseX, stage.mouseY);
 			if ( target.hitTest(pt.x, pt.y) && mvClicked ) {
-				console.log("do blue ball transition");
+				// movable のtween を削除
 				var movable = movables.getChildAt(mvIndex);
-		
-				createjs.Tween.get(movable)
-					.to({scaleX: 50, scaleY: 50}, 1000, createjs.Ease.linear);
+				createjs.Tween.removeTweens(movable);
+
+				//createjs.Tween.get(movable)
+				//	.to({scaleX: 50, scaleY: 50}, 1000, createjs.Ease.linear);
+
+				var transer = new createjs.Container();
+				var transObj = ina.circleB(0, 0, 30, "#333");
+				transer.addChild(transObj);
+				transer.x = stage.mouseX;
+				transer.y = stage.mouseY;
+				stage.addChild(transer);
+				createjs.Tween.get(transObj)
+					.to({scaleX: 200, scaleY: 200}, 1000, createjs.Ease.linear)
+					.call(transitionTo, [i]);
+
+				
 			}
 
 		}
@@ -224,6 +283,25 @@ function onMouseUp(event)
 
 	mvClicked  = false;
 	mvIndex    = false;
+}
+
+function transitionTo(number)
+{
+	// とりあえず遷移
+	switch (number) {
+		case 0:
+			// google
+			window.location = "https://www.google.com/";
+			break;
+		case 1:
+			// yahoo
+			window.location = "http://www.yahoo.co.jp/";
+			break;
+		case 2:
+			// ryukyu interactive
+			window.location = "http://www.ryukyu-i.co.jp/";
+			break;
+	}
 }
 
 function tick(event)
@@ -378,6 +456,13 @@ function tick(event)
 			return createCircle(x, y, size, color);
 		}
 
+		var circleB = function(x, y, size, color)
+		{
+			var object = this.circle(x, y, size, color);
+			blur(object, x, y, size);
+			return object;
+		}
+
 		// --- 暈し・残像付きの円 --- //
 		var povCircleB = function(x, y, size, numOfPOV, color)
 		{
@@ -500,6 +585,7 @@ function tick(event)
 
 		return {
 			circle: circle,
+			circleB: circleB,
 			povCircle: povCircle,
 			povCircleB: povCircleB,
 			transEffect: transEffect
