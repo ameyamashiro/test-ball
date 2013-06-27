@@ -132,7 +132,8 @@
 
 
 
-
+var STAGE_WIDTH = 1024;
+var STAGE_HEIGHT = 500;
 
 var stage;
 var canvas;
@@ -173,13 +174,38 @@ $(function() {
 	stage.addChild(targets);
 	stage.addChild(movables);
 
+	var bmp  = new createjs.Bitmap("./images/aqua_button.png");
+	var bmp2 = new createjs.Bitmap("./images/aqua_button_green.png");
+	var bmp3 = new createjs.Bitmap("./images/aqua_button_purple.png");
+
+	bmp.regX = 230 * 0.5;
+	bmp.regY = 230 * 0.50;
+	bmp2.regX = 230 * 0.50;
+	bmp2.regY = 230 * 0.50;
+	bmp3.regX = 230 * 0.50;
+	bmp3.regY = 230 * 0.50;
+
+	bmp.x  = STAGE_WIDTH * 0.2;
+	bmp2.x = STAGE_WIDTH * 0.5;
+	bmp3.x = STAGE_WIDTH * 0.8;
+	bmp.y  = STAGE_HEIGHT * 0.2;
+	bmp2.y = STAGE_HEIGHT * 0.2;
+	bmp3.y = STAGE_HEIGHT * 0.2;
+
+
+	stage.addChild(bmp);
+	stage.addChild(bmp2);
+	stage.addChild(bmp3);
+
 	// test balls
 	var blueC   = new Effects("BlurredCircle", 1024 * 0.2, 300, 80, "#00f");
 	var greenC  = new Effects("BlurredCircle", 1024 * 0.5, 300, 80, "#a0a");
 	var redC    = new Effects("BlurredCircle", 1024 * 0.8, 300, 80, "#40c");
+	/*
 	stage.addChild(blueC);
 	stage.addChild(greenC);
 	stage.addChild(redC);
+	*/
 	
 	// test tween
 	createjs.Tween.get(blueC, {loop: true})
