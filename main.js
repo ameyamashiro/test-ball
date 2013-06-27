@@ -12,6 +12,9 @@ var mvClicked = false;
 
 var ina;
 
+var STAGE_WIDTH  = 1024;
+var STAGE_HEIGHT = 500;
+
 $(function() {	
 	canvas = document.getElementById("canvas");
 	context = canvas.getContext("2d");
@@ -30,11 +33,6 @@ $(function() {
 		e.preventDefault();
 		return false;
 	}
-
-	targets  = new createjs.Container();
-	movables = new createjs.Container();
-	stage.addChild(targets);
-	stage.addChild(movables);
 
 	var bmp  = new createjs.Bitmap("./images/aqua_button.png");
 	var bmp2 = new createjs.Bitmap("./images/aqua_button_green.png");
@@ -58,6 +56,12 @@ $(function() {
 	stage.addChild(bmp);
 	stage.addChild(bmp2);
 	stage.addChild(bmp3);
+
+	targets  = new createjs.Container();
+	movables = new createjs.Container();
+	stage.addChild(targets);
+	stage.addChild(movables);
+
 
 	// test balls
 	var blueC   = new Effects("BlurredCircle", 1024 * 0.2, 300, 80, "#00f");
@@ -188,6 +192,7 @@ function onMouseUp(event)
 		for ( var i = 0; i < childNum; i++ ) {
 			var target = targets.getChildAt(i);
 			
+			/*
 			var pt = target.globalToLocal(stage.mouseX, stage.mouseY);
 			if ( target.hitTest(pt.x, pt.y) ) {
 				console.log("go to"+i);
@@ -201,17 +206,20 @@ function onMouseUp(event)
 				ina.transEffect(stage.mouseX, stage.mouseY, 50, 50, "#fff");
 
 			}
+			*/
+
+			var pt = target.globalToLocal(stage.mouseX, stage.mouseY);
+			if ( target.hitTest(pt.x, pt.y) && mvClicked ) {
+				console.log("do blue ball transition");
+				var movable = movables.getChildAt(mvIndex);
+		
+				createjs.Tween.get(movable)
+					.to({scaleX: 50, scaleY: 50}, 1000, createjs.Ease.linear);
+			}
+
 		}
-		/*
-		var pt = ball.globalToLocal(stage.mouseX, stage.mouseY);
-		if(ball.hitTest(pt.x, pt.y) && mvClicked) {
-			console.log("do blue ball transition");
-			var movable = movables.getChildAt(mvIndex);
-	
-			createjs.Tween.get(movable)
-				.to({scaleX: 50, scaleY: 50}, 1000, createjs.Ease.linear);
-		}
-		*/
+
+
 	}
 
 	mvClicked  = false;
@@ -244,8 +252,6 @@ function tick(event)
 
 
 (function (window) {
-	var STAGE_WIDTH  = 1024;
-	var STAGE_HEIGHT = 500;
 
 	function ina_createjs(stage)
 	{
